@@ -4,7 +4,6 @@ import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import "./Footer.css";
 
 export default function Footer() {
-  const [isMouseOver, setIsMouseOver] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(true);
 
   useEffect(() => {
@@ -34,9 +33,7 @@ export default function Footer() {
 
   return (
     <footer
-      className={`footer ${isFooterVisible ? "" : "hide-footer"} ${
-        isMouseOver ? "mouse-over" : ""
-      }`}
+      className={`footer ${isFooterVisible ? "" : "hide-footer"}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

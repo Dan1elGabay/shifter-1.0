@@ -17,3 +17,10 @@ export const getDate = timeStamp => {
   const postTime = `${date}/${month}/${year} | ${hr}:${min} `;
   return postTime;
 };
+
+export const addHours= (time, hours)=> {
+  const [hour, minute] = time.split(":");
+  const date = new Date();
+  date.setHours(date.getHours() + hours);
+  return `${date.getHours()}:${minute}`;
+}

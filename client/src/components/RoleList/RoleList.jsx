@@ -50,7 +50,7 @@ export default function RoleList(props) {
     try {
       const token = getJWT();
       const reqHeaders = { 'x-auth-token': token };
-      const response = await http.patch(`http://localhost:5000/api/roles/${role._id}`, role, { headers: reqHeaders });
+      await http.patch(`http://localhost:5000/api/roles/${role._id}`, role, { headers: reqHeaders });
       console.log(`Updating ${role.name} role has been success !`);
       setTimeout(() => {
         toast.success('התפקיד עודכן בהצלחה');
@@ -67,7 +67,7 @@ export default function RoleList(props) {
     try {
       const token = getJWT();
       const reqHeaders = { 'x-auth-token': token };
-      const response = await http.delete(`http://localhost:5000/api/roles/${role._id}`, { headers: reqHeaders });
+       await http.delete(`http://localhost:5000/api/roles/${role._id}`, { headers: reqHeaders });
       console.log(`Deleting ${role.name} role has been success !`);
       setTimeout(() => {
         toast.success('התפקיד נמחק בהצלחה');

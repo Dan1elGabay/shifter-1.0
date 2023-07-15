@@ -46,7 +46,6 @@ router.post("/register", async (req, res) => {
 
   user.password = generateHashPassword(user.password);
   await user.save();
-  //res.send(_.pick(user, ["_id", "name", "email", "imgUrl"]));
   res.json({
     token: generateAuthToken(user),
   });

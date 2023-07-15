@@ -50,3 +50,10 @@ h1 {
   .custom-list li span {
     margin-right: 0.5em; /* Add margin between bullet and text */
   }
+  .form-label {
+    color: #000000 !important;
+}
+.form-check .form-check-input {
+  float: right;
+  margin-right: -1.5em;
+}

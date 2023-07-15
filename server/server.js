@@ -9,7 +9,7 @@ const path = require('path');
 // *console.log(process.env.SERVER_PORT);
 
 //! uncomment on first load
-// require("./primaryData/seed")();
+// require("./database/seed")();
 
 // //* static folder
 app.use(express.static('./public/asset'))
@@ -34,7 +34,14 @@ const chalk = require("chalk");
 const morgan = require("morgan");
 app.use(morgan(chalk.cyan(":method :url :status :response-time ms")));
 
-
+//Implementing rate limiting helps protect your server from abuse or excessive traffic from a single user or IP address. 
+const rateLimit = require('express-rate-limit');
+const limiter = rateLimit({
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    max: 100, // maximum number of requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+  });
+  app.use(limiter);
 //* ===Static Folder: 'Uploads'
 //* Note that you don't need to make a separate GET request to the server to fetch the image - the express.static middleware will handle serving the file directly.
 const dirname = path.resolve();
@@ -46,13 +53,8 @@ app.use('/assets', express.static(path.join(dirname, '/assets')));
 const indexRouter = require('./routes/index'); app.use('/',indexRouter);
 const userRouter = require('./routes/userRouter'); app.use('/api/users',userRouter);
 const rolesRouter = require('./routes/rolesRouter'); app.use('/api/roles',rolesRouter);
+const contactFormRouter = require('./routes/contactFormRouter'); app.use('/api/contact-form/messages',contactFormRouter);
 
-// const productsRouter = require('./routes/productsRouter'); app.use('/api/products',productsRouter);
-//login
-//register
-//logout
-//users
-//shifts
 
 
 //* === run the server (on port ****) === //

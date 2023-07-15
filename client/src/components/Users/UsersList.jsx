@@ -8,8 +8,7 @@ import http from "../../services/httpService";
 import "./UsersList.css";
 import UsersEditFormModal from "./UsersEditFormModal";
 import UseresDeleteAuthModal from "./UseresDeleteAuthModal";
-import RoleList from "../RoleList/RoleList";
-import RolelistDropDown from "../RoleList/RolelistDropDown";
+
 
 export default function UsersList(props) {
   const [users, setUsers] = useState(null);
@@ -38,7 +37,7 @@ export default function UsersList(props) {
     try {
       const token = getJWT();
       const reqHeaders = { "x-auth-token": token };
-      const response = await http.patch(
+      await http.patch(
         `http://localhost:5000/api/users/${updatedUser._id}`,
         updatedUser,
         { headers: reqHeaders }
@@ -91,7 +90,7 @@ export default function UsersList(props) {
     try {
       const token = getJWT();
       const reqHeaders = { "x-auth-token": token };
-      const response = await http.delete(
+       await http.delete(
         `http://localhost:5000/api/users/${user._id}`,
         { headers: reqHeaders }
       );

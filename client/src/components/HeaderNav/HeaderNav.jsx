@@ -25,11 +25,26 @@ export default function HeaderNav(props) {
           aria-controls="responsive-navbar-nav"
           onClick={handleNavToggle}
         />
+        <Navbar.Brand>
+          <Link to="/">
+            <img
+              src={logo}
+              height="30"
+              className="d-inline-block align-top"
+              alt="Logo"
+            />
+          </Link>
+        </Navbar.Brand>
         <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="ml-auto nav-links">
+            <Link to="/About">אודות המערכת</Link>
+            <Link to="/Pricing">מסלולי הצטרפות</Link>
+            <Link to="/ContactUs">צור קשר</Link>
+          </Nav>
           <Nav className="mr-auto ">
             {props.user ? (
               <>
-                <Link to="/profile" className="nav-link">
+                <Link to="/Profile" className="nav-link">
                   <img
                     src={props.user.imgUrl}
                     alt="Profile"
@@ -46,29 +61,14 @@ export default function HeaderNav(props) {
                   התחבר
                 </Link>
                 <img
-                  src="https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png"
+                  src="http://localhost:5000/assets/images/user-profile-default.png"
                   alt="User Profile Default"
                   className="user-profile-img"
                 />
               </>
             )}
           </Nav>
-          <Nav className="ml-auto nav-links">
-            <Link to="/About">אודות המערכת</Link>
-            <Link to="/Pricing">מסלולי הצטרפות</Link>
-            <Link to="/ContactUs">צור קשר</Link>
-          </Nav>
         </Navbar.Collapse>
-        <Navbar.Brand>
-          <Link to="/">
-            <img
-              src={logo}
-              height="30"
-              className="d-inline-block align-top"
-              alt="Logo"
-            />
-          </Link>
-        </Navbar.Brand>
       </Container>
     </Navbar>
   );

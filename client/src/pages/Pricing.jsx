@@ -5,7 +5,6 @@ import "./Page.css";
 import { BiCheckCircle } from "react-icons/bi";
 import Image from "react-bootstrap/Image";
 import homepageImage from "../images/homepageimage-removebg-preview.png";
-import { FaConnectdevelop } from "react-icons/fa";
 
 export default function Pricing() {
   return (

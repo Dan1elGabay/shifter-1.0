@@ -1,15 +1,11 @@
-import Container from "react-bootstrap/Container";
+import React from 'react';
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import "./Home.css";
 import "./Page.css";
-import { BiCheckCircle } from "react-icons/bi";
-import ListGroup from "react-bootstrap/ListGroup";
+
 import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Image from "react-bootstrap/Image";
-import homepageImage from "../images/homepageimage-removebg-preview.png";
-import { FaConnectdevelop } from "react-icons/fa";
+
 import { Link } from "react-router-dom";
 
 export default function Home() {

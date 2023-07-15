@@ -39,7 +39,7 @@ export default function Login() {
         } else {
           window.location = "/UserDashboard";
         }
-      }, 5000);
+      }, 2500);
     } catch (error) {
       console.log("error...");
       if (error.response && error.response.status >= 400) {
@@ -74,6 +74,7 @@ export default function Login() {
                 value={password}
                 onChange={handlePasswordChange}
                 required
+                minLength={6}
               />
             </Form.Group>
 
