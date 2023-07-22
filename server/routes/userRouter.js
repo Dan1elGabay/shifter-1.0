@@ -8,15 +8,19 @@ const connect = require("../database/database");
 const mongoose = require("mongoose");
 //user schema
 const { userModel } = require("../models/userModel"); //user validate Registration schema
+
+//Middlewares
 const validateRegistration = require("../middlewares/usersValidations/registration");
-const validateUpdateUser = require('../middlewares/usersValidations/updatedUser')
+const validateUpdateUser = require("../middlewares/usersValidations/updatedUser");
 const auth = require("../middlewares/authorization");
 const adminAuth = require("../middlewares/adminAuthorization");
 const validateSignin = require("../middlewares/usersValidations/signIn");
 const { comparePassword, generateHashPassword } = require("../services/bcrypt");
-const { storage, upload } = require("../multer/multer");
-
 const { generateAuthToken } = require("../services/token");
+
+// allow to using the server upload files/images
+const multer = require("multer");
+const {storage,upload} = require('../multer/multer')
 
 //============ Register ===========//
 
@@ -88,8 +92,7 @@ router.get("/", adminAuth, async function (req, res) {
     return res.status(401).send("Unauthorized: User is not an admin");
   }
   try {
-    const users = await userModel.find()
-      .populate("roles", "name color"); // Populate the 'roles' field with the 'name' and 'color' fields
+    const users = await userModel.find().populate("roles", "name color"); // Populate the 'roles' field with the 'name' and 'color' fields
 
     console.log(chalk.redBright("Users list has been sent successfully"));
     return res.status(200).json({ found: users });
@@ -140,69 +143,76 @@ router.post("/", adminAuth, async function (req, res) {
       inserted: user,
     });
   });
-
-  // res.send(_.pick(user, ["_id", "name", "email", "imgUrl"]));
-  // res.json({
-  //   token: generateAuthToken(user),
-  // });
 });
 
 //============ Update some user's values ===========//
 
-router.patch("/:id", auth, upload.single("imgUrl"), async function (req, res) {
-  const id = req.params.id;
-  const data = req.body;
-  // Check if the requester is an admin or if the user ID in the request parameter matches the ID of the authenticated user
-  if (!req.user || (!req.user.isAdmin && req.userId !== id)) {
-    console.log(
-      chalk.redBright("Unauthorized: User is not allowed to update this user")
-    );
-    return res
-      .status(401)
-      .send("Unauthorized: User is not allowed to update this user");
-  }
+router.patch(
+  "/:id",
+  auth,
+  upload.single("imgUrl"),
+  async function (req, res, next) {
+    const id = req.params.id;
+    const data = req.body;
+console.log(req.body);
+    // Check if the requester is an admin or if the user ID in the request parameter matches the ID of the authenticated user
+    if (!req.user && (!req.user.isAdmin || req.user._id !== id)) {
+      console.log(
+        chalk.redBright("Unauthorized: User is not allowed to update this user")
+      );
+      return res
+        .status(401)
+        .send("Unauthorized: User is not allowed to update this user");
+    }
 
-  let { error } = validateUpdateUser(data);
-  if (error) {
-    console.log(chalk.redBright(error.details[0].message));
-    return res.status(400).send(error.details[0].message);
-  }
-  // Check if the email exists and belongs to a different user
-  const existingUser = await userModel.findOne({ email: req.body.email });
-  if (existingUser && existingUser._id.toString() !== id) {
-    console.log(chalk.redBright("Email already exists in the system"));
-    return res.status(400).send("כתובת האימייל שהזנת כבר במערכת.");
-  }
+    let { error } = validateUpdateUser(data);
+    if (error) {
+      console.log(chalk.redBright(error.details[0].message));
+      return res.status(400).send(error.details[0].message);
+    }
 
-  data.password = generateHashPassword(data.password);
+    // Check if the email exists and belongs to a different user
+    const existingUser = await userModel.findOne({ email: req.body.email });
+    if (existingUser && existingUser._id.toString() !== id) {
+      console.log(chalk.redBright("Email already exists in the system"));
+      return res.status(400).send("כתובת האימייל שהזנת כבר במערכת.");
+    }
 
-  // Set default value for imgUrl field if it is not present in the request body
-  if (req.file) {
-    data.imgUrl=req.file.path.replace("\\", "/")
-  }
-  if (!data.imgUrl) {
-    data.imgUrl =
+    data.password = generateHashPassword(data.password);
+
+    // Set default value for imgUrl field if it is not present in the request body
+    if (req.file) {
+      data.imgUrl = req.file.path.replace("\\", "/");
+    }else{
+      data.imgUrl =
       "http://localhost:5000/assets/images/user-profile-default.png";
-  }
+    }
+    if (!data.imgUrl) {
+      data.imgUrl =
+        "http://localhost:5000/assets/images/user-profile-default.png";
+    }
 
-  userModel.findByIdAndUpdate(
-    id,
-    data,
-    { new: true },
-    (err, doc) => {
+    userModel.findByIdAndUpdate(id, data, { new: true }, (err, doc) => {
       // Check if there was an error
       if (err) {
         console.log(err);
         return res.status(500).json({ error: err.message });
       }
+      if (!doc) {
+        console.log(`- Couldn't find item with id '${id}'`);
+        return res
+          .status(404)
+          .json({ error: `Couldn't find item with id '${id}'` });
+      }
       console.log("User successfully updated", doc);
+      // Respond with the updated user outside the callback
       return res.status(200).json({
         message: "Successfully updated",
         updated: doc,
       });
-    }
-  );
-});
+    });
+  }
+);
 
 //============ GET a (single) user by id ===========//
 
