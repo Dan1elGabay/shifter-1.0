@@ -1,20 +1,20 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState,useEffect } from "react";
 
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Card } from "react-bootstrap";
 import { AuthContext } from "../context/authContext";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
+import { getJWT } from "../services/userService";
+import { toast } from "react-toastify";
+import http from "../services/httpService";
+import { Link } from "react-router-dom";
 
 export default function Profile(props) {
-
   const { userData } = useContext(AuthContext);
-  console.log(userData);
-  console.log(userData?.name); // Safely access the name property of userData
-
-
-  const [name, setName] = useState(userData?.name);
-  const [email, setEmail] = useState(userData?.email);
-  const [password, setPassword] = useState(userData?.password);
-  const [imgUrl, setImgUrl] = useState(userData?.imgUrl);
+  const [name, setName] = useState(userData?.name || ""); // Safely access the name property of userData
+  const [email, setEmail] = useState(userData?.email || "");
+  const [password, setPassword] = useState(userData?.password || "");
+  const [imgUrl, setImgUrl] = useState(userData?.imgUrl || "");
+  // const [formData, setFormData] = useState(new FormData());
 
 
   const handleNameChange = (e) => setName(e.target.value);
@@ -22,41 +22,40 @@ export default function Profile(props) {
   const handlePassowrdChange = (e) => setPassword(e.target.value);
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImagePath(URL.createObjectURL(file));
+    setImgUrl(URL.createObjectURL(file));
   };
 
- 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     const formData = new FormData();
-        formData.append("cn_s2p", newProduct.cn_s2p);
-        formData.append("cn_client", newProduct.cn_client);
-        formData.append("company", newProduct.company);
-        formData.append("description", newProduct.description);
-        formData.append("image", newProduct.image);
-        const response = await createProduct(formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        console.log(response);
-        console.log(response.data.inserted.imagePath);
-        //after get the response dont show the form
-        // const [showForm, setShowForm] = useState(false);
-        console.log(
-          `Created new product: ${response.data.inserted.description}`
-        );
-
-    const updatedUser = {
-      ...userData,
-      name,
-      email,
-      password,
-      
-    };
-    console.log(updatedUser);
-    props.onSaveChanges(updatedUser);
-    props.onClose();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("imgUrl", imgUrl);
+  console.log(...formData);
+    // try {
+    //   const token = getJWT();
+    //   const reqHeaders = {
+    //     "x-auth-token": token,
+    //     "Content-Type": "multipart/form-data",
+    //   };
+    //   await http.patch(
+    //     `http://localhost:5000/api/users/${userData?._id}`,
+    //     formData,
+    //     { headers: reqHeaders }
+    //   );
+    //   console.log(formData);
+    //   console.log(`Updating ${userData?.name} user has been success !`);
+    //   // setTimeout(() => {
+    //   //   toast.success("המשתמש עודכן בהצלחה");
+    //   //   window.location = "/UserDashboard";
+    //   // }, 2000);
+    // } catch (error) {
+    //   console.log(error);
+    //   toast.error("אירעה שגיאה בעת עדכון המשתמש");
+    // }
   };
+  
+  
   return (
     <ProtectedRoute allowedRoles={["all"]}>
       <>
@@ -66,14 +65,18 @@ export default function Profile(props) {
               <Container>
                 <h1>עריכת פרופיל אישי</h1>
 
-                <Row>
-                  <Col>
-                    <Form>
-                    {imagePath && (
-              <Card style={{ width: "18rem", marginBottom: "20px" }}>
-                <Card.Img variant="top" src={imagePath} alt="pre image" />
-              </Card>
-            )}
+                <Row className="d-flex justify-content-center">
+                  <Col xs={6}>
+                    <Form encType="multipart/form-data">
+                      {userData && (
+                        <Card style={{ width: "18rem", marginBottom: "20px" }}>
+                          <Card.Img
+                            variant="top"
+                            src={imgUrl ? imgUrl : userData?.imgUrl}
+                            alt="pre image"
+                          />
+                        </Card>
+                      )}
                       <Form.Group controlId="formName">
                         <Form.Label>שם מלא:</Form.Label>
                         <Form.Control
@@ -92,6 +95,7 @@ export default function Profile(props) {
                           value={email}
                           onChange={handleEmailChange}
                           required
+                          autoComplete="username"
                         />
                       </Form.Group>
                       <Form.Group controlId="formPassword">
@@ -103,24 +107,32 @@ export default function Profile(props) {
                           value={password}
                           onChange={handlePassowrdChange}
                           required
+                          autoComplete="current-password"
                         />
                       </Form.Group>
-                      <Form.Group className="mb-3 form-group " controlId="formGroupFile">
-              <Form.Label> תמונה:</Form.Label>
-              <Form.Control
-                type="file"
-                name="image"
-                onChange={handleImageChange}
-              />
-            </Form.Group>
-                      <div className="d-flex justify-content-center  mt-4">
-                        <Button variant="primary" onClick={handleSaveChanges}>
-                          שמור שינויים
-                        </Button>
-                        <Button variant="secondary" onClick={props.onClose}>
-                          סגור
-                        </Button>
-                      </div>
+                      <Form.Group
+                        className="mb-3 form-group "
+                        controlId="formGroupFile"
+                      >
+                        <Form.Label> תמונה:</Form.Label>
+                        <Form.Control
+                          type="file"
+                          name="imgUrl"
+                          onChange={handleImageChange}
+                        />
+                      </Form.Group>
+                      <Row className="d-flex justify-content-center  mt-4">
+                        <Col>
+                          <Link to="/UserDashboard">
+                            <Button variant="secondary">חזור</Button>
+                          </Link>
+                        </Col>
+                        <Col>
+                          <Button variant="primary" onClick={handleSaveChanges}>
+                            שמור שינויים
+                          </Button>
+                        </Col>
+                      </Row>
                     </Form>
                   </Col>
                 </Row>

@@ -42,8 +42,8 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.',
   });
   app.use(limiter);
+  
 //* ===Static Folder: 'Uploads'
-//* Note that you don't need to make a separate GET request to the server to fetch the image - the express.static middleware will handle serving the file directly.
 const dirname = path.resolve();
 app.use('/uploads', express.static(path.join(dirname, '/uploads')));
 app.use('/assets', express.static(path.join(dirname, '/assets')));
