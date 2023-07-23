@@ -14,6 +14,9 @@ const path = require('path');
 // //* static folder
 app.use(express.static('./public/asset'))
 
+// allow to using the server upload files/images
+const multer = require('multer');
+
 //* ===  Cors-handle different GET routes === //
 const cors = require('cors');
 app.use(cors());
@@ -43,7 +46,7 @@ const limiter = rateLimit({
   });
   app.use(limiter);
   
-//* ===Static Folder: 'Uploads'
+//* ===Static Folders:
 const dirname = path.resolve();
 app.use('/uploads', express.static(path.join(dirname, '/uploads')));
 app.use('/assets', express.static(path.join(dirname, '/assets')));

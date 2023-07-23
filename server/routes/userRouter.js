@@ -20,7 +20,9 @@ const { generateAuthToken } = require("../services/token");
 
 // allow to using the server upload files/images
 const multer = require("multer");
-const {storage,upload} = require('../multer/multer')
+// const upload = multer({dest: __dirname + "/uploads"})
+const {storage,upload} = require('../multer/multer');
+const { date } = require("joi");
 
 //============ Register ===========//
 
@@ -151,7 +153,7 @@ router.patch(
   "/:id",
   auth,
   upload.single("imgUrl"),
-  async function (req, res, next) {
+  async function (req, res) {
     const id = req.params.id;
     const data = req.body;
 console.log(req.body);
@@ -182,14 +184,10 @@ console.log(req.body);
 
     // Set default value for imgUrl field if it is not present in the request body
     if (req.file) {
-      data.imgUrl = req.file.path.replace("\\", "/");
-    }else{
-      data.imgUrl =
-      "http://localhost:5000/assets/images/user-profile-default.png";
-    }
-    if (!data.imgUrl) {
-      data.imgUrl =
-        "http://localhost:5000/assets/images/user-profile-default.png";
+      const fileName = req.file.path.replace("\\", "/");
+      data.imgUrl = `http://localhost:5000/${fileName}`;
+    } else {
+      data.imgUrl = "http://localhost:5000/assets/images/user-profile-default.png";
     }
 
     userModel.findByIdAndUpdate(id, data, { new: true }, (err, doc) => {
@@ -204,6 +202,7 @@ console.log(req.body);
           .status(404)
           .json({ error: `Couldn't find item with id '${id}'` });
       }
+      //TODO: i need to send a new token that will update the userData variable on the front.
       console.log("User successfully updated", doc);
       // Respond with the updated user outside the callback
       return res.status(200).json({
