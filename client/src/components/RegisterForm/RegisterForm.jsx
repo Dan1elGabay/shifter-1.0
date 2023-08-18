@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { Form, Button } from "react-bootstrap";
 import "./RegisterForm.css";
 import { signup } from "../../services/userService";
- import { TfiBackLeft } from "react-icons/tfi";
+import { TfiBackLeft } from "react-icons/tfi";
 
 // import http from "../../services/httpService";
 // import dotenv from "dotenv";
@@ -14,14 +14,24 @@ export default function RegisterForm(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [passwordValidation, setPasswordValidation] = useState(false);
+
+
+
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
+    const newPassword = e.target.value;
+
+    const passwordPattern = /^([@#](?=[^aeiou]{7,13}$)(?=[a-zA-Z0-9]{7,13}$)(?=.*[A-Z]{1,})(?=.*\d{4,})(?=.*[!@#$%^&*()\-_+]).+)$/;
+
+    const isValid = passwordPattern.test(newPassword);
+    setPasswordValidation(isValid);
+
+    setPassword(newPassword);    };
 
   const handleNameChange = (e) => {
     setName(e.target.value);
@@ -80,10 +90,15 @@ export default function RegisterForm(props) {
           value={password}
           onChange={handlePasswordChange}
           required
-          minLength={6}
         />
       </Form.Group>
-
+      {passwordValidation ? (
+            <div className="password-validation success">הסיסמה תקינה</div>
+          ) : (
+            <div className="password-validation error">
+              הסיסמה חייבת לכלול לפחות אות גדולה, אות קטנה, 4 מספרים ותו מיוחד (!@#$%^&*()_-+)
+            </div>
+          )}
       <Button variant="primary" type="submit">
         הרשם
       </Button>
