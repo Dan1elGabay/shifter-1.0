@@ -74,10 +74,8 @@ export default function Login() {
                 value={password}
                 onChange={handlePasswordChange}
                 required
-                minLength={6}
               />
             </Form.Group>
-
             <Button
               variant="primary"
               style={{ backgroundColor: "green" }}
